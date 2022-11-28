@@ -1,3 +1,4 @@
+const swatches = document.querySelectorAll(".swatch");
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 ctx.lineWidth = 1;
@@ -70,6 +71,16 @@ const handleMouseUp = (e: PointerEvent) => {
   lastMouseMovePos = false;
 };
 
+const handleSwatchClick = (e: PointerEvent) => {
+  const target = e.target as HTMLDivElement;
+  console.log(target.style.background);
+};
+
 document.addEventListener("mousedown", handleMouseDown);
 document.addEventListener("mouseup", handleMouseUp);
 canvas.addEventListener("mousemove", handleMouseMove);
+
+// listeners for palette swatches
+swatches.forEach((swatch) =>
+  swatch.addEventListener("click", handleSwatchClick)
+);

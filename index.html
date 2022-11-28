@@ -1,10 +1,38 @@
 <html>
   <head>
     <title>Watercolor</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+
+      #palette {
+        display: flex;
+        flex-wrap: wrap;
+        border: 1px solid black;
+        justify-content: space-around;
+        width: 60px;
+      }
+
+      .swatch {
+        width: 20px;
+        height: 20px;
+        background: attr("data-color");
+        cursor: pointer;
+      }
+    </style>
   </head>
 
   <body>
-    <canvas width="600" height="600" style="border: 1px solid black"> </canvas>
+    <canvas width="600" height="600"> </canvas>
+
+    <div id="palette">
+      <div class="swatch" style="background: red"></div>
+      <div class="swatch" style="background: green"></div>
+      <div class="swatch" style="background: blue"></div>
+      <div class="swatch" style="background: black"></div>
+    </div>
+
     <script src="dist/index.js"></script>
   </body>
 </html>
