@@ -36,6 +36,8 @@ const lineBetween = (pos1: [number, number], pos2: [number, number]) => {
 
     // render the path
     ctx.beginPath();
+    // add 0.5 because positions are between pixels by default.
+    // I want solid black lines.
     ctx.moveTo(x1 + 0.5, y1 + 0.5);
     ctx.lineTo(x2 + 0.5, y2 + 0.5);
     ctx.stroke();
