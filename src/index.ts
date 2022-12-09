@@ -1,7 +1,6 @@
 const swatches = document.querySelectorAll(".swatch");
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
 ctx.lineWidth = 1;
 ctx.strokeStyle = "black";
 
@@ -15,9 +14,15 @@ const colors: { [key: string]: Color } = {
   blue: [0, 0, 255, 1],
 };
 
-let drawing = true;
-let lastMouseMovePos: false | Coords = false;
 let selectedColor = colors.black;
+
+// is user currently drawing a line?
+// if so, from where
+let isDrawingFrom: Coords | false = false;
+
+// is user currently applying a fill?
+// if so, what color
+let isFillingWithColor: Color | false = false;
 
 /** Draw a single pixel */
 const drawColorPixel = (pos: Coords, color: Color) => {
@@ -42,7 +47,7 @@ const drawColorPixel = (pos: Coords, color: Color) => {
 
 /** Draw a black line between two points */
 const lineBetween = (pos1: Coords, pos2: Coords) => {
-  if (lastMouseMovePos) {
+  if (isDrawingFrom) {
     const [x1, y1] = pos1;
     const [x2, y2] = pos2;
 
@@ -62,27 +67,27 @@ const handleMouseDown = (e: PointerEvent) => {
   const y = e.clientY - canvas.offsetTop;
 
   // save as starting position for a potential line
-  lastMouseMovePos = [x, y];
+  isDrawingFrom = [x, y];
 
   // draw the pixel
   drawColorPixel([x, y], selectedColor);
 };
 
 const handleMouseMove = (e: PointerEvent) => {
-  if (lastMouseMovePos) {
+  if (isDrawingFrom) {
     const x = e.clientX - canvas.offsetLeft;
     const y = e.clientY - canvas.offsetTop;
 
-    lineBetween(lastMouseMovePos, [x, y]);
+    lineBetween(isDrawingFrom, [x, y]);
 
     // save the new starting position
-    lastMouseMovePos = [x, y];
+    isDrawingFrom = [x, y];
   }
 };
 
 const handleMouseUp = (e: PointerEvent) => {
-  // clear line starting position
-  lastMouseMovePos = false;
+  isDrawingFrom = false;
+  isFillingWithColor = false;
 };
 
 const handleSwatchClick = (e: MouseEvent) => {
