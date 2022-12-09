@@ -85,10 +85,14 @@ const handleMouseUp = (e: PointerEvent) => {
   lastMouseMovePos = false;
 };
 
-const handleSwatchClick = (e: PointerEvent) => {
+const handleSwatchClick = (e: MouseEvent) => {
+  // get the color name from the div's style
   const target = e.target as HTMLDivElement;
   const colorName = target.style.background;
+
+  // set selectedColor
   selectedColor = colors[colorName];
+  // set line color for canvas
   ctx.strokeStyle = `rgba(${selectedColor.join(",")})`;
 };
 
