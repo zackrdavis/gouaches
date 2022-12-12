@@ -1,7 +1,9 @@
 const swatches = document.querySelectorAll(".swatch");
 const canvas = document.querySelector("canvas");
+const cvWidth = canvas.width;
+const cvHeight = canvas.height;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
-ctx.lineWidth = 1;
+ctx.lineWidth = 2;
 ctx.strokeStyle = "black";
 
 type Coords = [number, number];
@@ -22,117 +24,54 @@ let isDrawingFrom: Coords | false = false;
 
 // is user currently applying a fill?
 // if so, what color
-let isFillingWithColor: Color | false = false;
+//let isFillingWithColor: Color | false = false;
 
 // set and clear this timer when filling or finished
 let fillInterval = 0;
 let testStack: Coords[] = [];
 
-const nTimes = (n: number, fn: any) => {
-  for (let i = 0; i < n; i++) {
-    fn();
-  }
-};
-
 const fill = () => {
-  if (testStack.length > 0) {
-    const testNode = testStack.shift();
+  nTimes(() => {
+    if (testStack.length > 0) {
+      // inefficient queue
+      const testNode = testStack.shift();
 
-    // check for insideness (Blankness?)
-    if (isColorEq(getPixelColor(testNode), [0, 0, 0, 0])) {
-      drawColorPixel(testNode, selectedColor);
+      // check for insideness (currently blankness)
+      if (isColorEq(getPixelColor(testNode), [0, 0, 0, 0])) {
+        drawColorPixel(testNode, selectedColor);
 
-      // west, east, north and south nodes
-      const neighbors: Coords[] = [
-        [testNode[0] + 1, testNode[1]],
-        [testNode[0] - 1, testNode[1]],
-        [testNode[0], testNode[1] + 1],
-        [testNode[0], testNode[1] - 1],
-      ];
+        // west, east, north and south nodes
+        const neighbors: Coords[] = [
+          [testNode[0] + 1, testNode[1]],
+          [testNode[0] - 1, testNode[1]],
+          [testNode[0], testNode[1] + 1],
+          [testNode[0], testNode[1] - 1],
+        ];
 
-      testStack.push(...neighbors);
+        const insideCanvas = neighbors.filter(
+          (node) =>
+            node[0] <= cvWidth - 1 &&
+            node[1] <= cvHeight - 1 &&
+            node[0] >= 0 &&
+            node[1] >= 0
+        );
+
+        shuffleArray(insideCanvas);
+
+        testStack.push(...insideCanvas);
+      }
     }
-  }
-};
-
-const isColorEq = (colorA: Color, colorB: Color) => {
-  return (
-    colorA[0] == colorB[0] &&
-    colorA[1] == colorB[1] &&
-    colorA[2] == colorB[2] &&
-    colorA[3] == colorB[3]
-  );
-};
-
-const getPixelColor = (pos: Coords) => {
-  const [x, y] = pos;
-
-  // convert x,y to the start index for the color data
-  const imageIndex = x + y * canvas.width;
-
-  // get the current imageData
-  const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-  return [
-    image.data[imageIndex * 4 + 0],
-    image.data[imageIndex * 4 + 1],
-    image.data[imageIndex * 4 + 2],
-    image.data[imageIndex * 4 + 3],
-  ] as Color;
+  }, testStack.length);
 };
 
 const startFill = (pos: Coords) => {
   testStack.push(pos);
-  fillInterval = setInterval(() => {
-    nTimes(20, fill);
-  }, 10);
+  fillInterval = setInterval(fill, 10);
 };
 
 const stopFill = () => {
   clearInterval(fillInterval);
   testStack = [];
-};
-
-/** Draw a single pixel */
-const drawColorPixel = (pos: Coords, color: Color) => {
-  const [x, y] = pos;
-
-  // stop if pos outside canvas bounds
-  if (x > canvas.width || y > canvas.height) return false;
-
-  const [r, g, b, a] = color;
-
-  // convert x,y to the start index for the color data
-  const imageIndex = x + y * canvas.width;
-
-  // get the current imageData
-  const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-  // add the new pixel
-  image.data[imageIndex * 4 + 0] = r;
-  image.data[imageIndex * 4 + 1] = g;
-  image.data[imageIndex * 4 + 2] = b;
-  image.data[imageIndex * 4 + 3] = a;
-
-  // write the new image to the canvas
-  ctx.putImageData(image, 0, 0);
-};
-
-/** Draw a black line between two points */
-const lineBetween = (pos1: Coords, pos2: Coords) => {
-  if (isDrawingFrom) {
-    const [x1, y1] = pos1;
-    const [x2, y2] = pos2;
-
-    // render the path
-    ctx.beginPath();
-    // add 0.5 because positions are between pixels by default.
-    // I want solid black lines.
-    ctx.moveTo(x1 + 0.5, y1 + 0.5);
-    ctx.lineTo(x2 + 0.5, y2 + 0.5);
-    ctx.stroke();
-    ctx.closePath();
-  }
 };
 
 const handleMouseDown = (e: PointerEvent) => {
@@ -142,13 +81,12 @@ const handleMouseDown = (e: PointerEvent) => {
   // save as starting position for a potential line
   if (selectedColor == colors.black) {
     isDrawingFrom = [x, y];
+    // initial pixel
+    drawColorPixel([x, y], selectedColor);
   } else {
-    isFillingWithColor = selectedColor;
+    //isFillingWithColor = selectedColor;
     startFill([x, y]);
   }
-
-  // draw the pixel
-  //drawColorPixel([x, y], selectedColor);
 };
 
 const handleMouseMove = (e: PointerEvent) => {
@@ -165,7 +103,7 @@ const handleMouseMove = (e: PointerEvent) => {
 
 const handleMouseUp = (e: PointerEvent) => {
   isDrawingFrom = false;
-  isFillingWithColor = false;
+  //isFillingWithColor = false;
   stopFill();
 };
 
