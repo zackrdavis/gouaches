@@ -24,50 +24,66 @@ let isDrawingFrom: Coords | false = false;
 
 // set and clear this timer when filling or finished
 let fillInterval = 0;
+
+let fillStart: Coords = [0, 0];
+// queue of pixels to test/fill
 let testStack: Coords[] = [];
+// 2D array to track already-filled pixels by qualities other than color
+let pixelMap: Color[][];
+// init pixelMap
+resetPixelMap();
 
 const fill = () => {
-  nTimes(() => {
-    if (testStack.length > 0) {
-      // inefficient queue
-      const testNode = testStack.shift();
+  if (testStack.length > 0) {
+    const [x, y] = testStack.shift();
 
-      // check for insideness (currently blankness)
-      if (isColorEq(getPixelColor(testNode), [0, 0, 0, 0])) {
-        drawColorPixel(testNode, selectedColor);
+    const testColor = getPixelColor([x, y]);
 
-        // west, east, north and south nodes
-        const neighbors: Coords[] = [
-          [testNode[0] + 1, testNode[1]],
-          [testNode[0] - 1, testNode[1]],
-          [testNode[0], testNode[1] + 1],
-          [testNode[0], testNode[1] - 1],
-        ];
+    const mapColor = pixelMap[x][y];
 
-        const insideCanvas = neighbors.filter(
-          (node) =>
-            node[0] <= cvWidth - 1 &&
-            node[1] <= cvHeight - 1 &&
-            node[0] >= 0 &&
-            node[1] >= 0
-        );
+    if (
+      // color is not black (uncrossable crayon lines)
+      !isColorEq(testColor, [0, 0, 0, 255]) &&
+      // map says this color is not set
+      isColorEq(mapColor, [0, 0, 0, 0])
+    ) {
+      drawColorPixel([x, y], selectedColor);
 
-        shuffleArray(insideCanvas);
+      // save where we drew the new color
+      pixelMap[x][y] = selectedColor;
 
-        testStack.push(...insideCanvas);
-      }
+      // west, east, north and south nodes
+      const neighbors = [
+        [x + 1, y],
+        [x - 1, y],
+        [x, y + 1],
+        [x, y - 1],
+      ].filter(isInBounds) as Coords[];
+
+      // shuffleArray(insideCanvas);
+
+      testStack.push(...neighbors);
     }
-  }, testStack.length);
+  }
 };
 
 const startFill = (pos: Coords) => {
+  fillStart = pos;
   testStack.push(pos);
-  fillInterval = setInterval(fill, 10);
+
+  fillInterval = setInterval(
+    // increase loops-per-second at same rate that testStack is growing
+    () => nTimes(fill, testStack.length),
+    10
+  );
 };
 
 const stopFill = () => {
   clearInterval(fillInterval);
+
+  // reset lists
   testStack = [];
+  resetPixelMap();
 };
 
 const handleMouseDown = (e: PointerEvent) => {

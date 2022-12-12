@@ -1,8 +1,22 @@
+/** Reset the pixel map */
+const resetPixelMap = () => {
+  pixelMap = [...Array(cvWidth)].map((_) =>
+    [...Array(cvHeight)].map((_) => [0, 0, 0, 0])
+  );
+};
+
 /** Repeat a function `n` times */
 const nTimes = (fn: any, n: number) => {
   for (let i = 0; i < n; i++) {
     fn();
   }
+};
+
+/** get diagonal distance between coordinates */
+const distance = ([x1, y1]: Coords, [x2, y2]: Coords) => {
+  const a = x1 - x2;
+  const b = y1 - y2;
+  return Math.sqrt(a * a + b * b);
 };
 
 /**
@@ -27,19 +41,19 @@ const isColorEq = (colorA: Color, colorB: Color) => {
   );
 };
 
-/** Get the color of a canvas pixel */
-const getPixelColor = (pos: Coords) => {
-  const [x, y] = pos;
+const isInBounds = ([x, y]: Coords) => {
+  return x <= cvWidth - 1 && y <= cvHeight - 1 && x >= 0 && y >= 0;
+};
 
+/** Get the color of a canvas pixel */
+const getPixelColor = ([x, y]: Coords) => {
   const imageData = ctx.getImageData(x, y, 1, 1).data;
 
   return [imageData[0], imageData[1], imageData[2], imageData[3]] as Color;
 };
 
 /** Draw a single pixel */
-const drawColorPixel = (pos: Coords, color: Color) => {
-  const [x, y] = pos;
-
+const drawColorPixel = ([x, y]: Coords, color: Color) => {
   const [r, g, b, a] = color;
 
   ctx.fillStyle = "rgba(" + [r, g, b, a / 255].join() + ")";
@@ -47,17 +61,14 @@ const drawColorPixel = (pos: Coords, color: Color) => {
 };
 
 /** Draw a black line between two points */
-const lineBetween = (pos1: Coords, pos2: Coords) => {
+const lineBetween = ([x1, y1]: Coords, [x2, y2]: Coords) => {
   if (isDrawingFrom) {
-    const [x1, y1] = pos1;
-    const [x2, y2] = pos2;
-
     // render the path
     ctx.beginPath();
     // add 0.5 because positions are between pixels by default.
     // I want solid black lines.
-    ctx.moveTo(x1 + 0.5, y1 + 0.5);
-    ctx.lineTo(x2 + 0.5, y2 + 0.5);
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
     ctx.stroke();
     ctx.closePath();
   }
