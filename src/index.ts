@@ -47,7 +47,11 @@ const fill = () => {
       // map says this color is not set
       isColorEq(mapColor, [0, 0, 0, 0])
     ) {
-      drawColorPixel([x, y], selectedColor);
+      const distFromStart = Math.round(distance(fillStart, [x, y]));
+      const newColor: Color = [...selectedColor];
+      newColor[3] = Math.max(selectedColor[3] - distFromStart, 20);
+
+      drawColorPixel([x, y], newColor);
 
       // save where we drew the new color
       pixelMap[x][y] = selectedColor;
@@ -59,8 +63,6 @@ const fill = () => {
         [x, y + 1],
         [x, y - 1],
       ].filter(isInBounds) as Coords[];
-
-      // shuffleArray(insideCanvas);
 
       testStack.push(...neighbors);
     }
