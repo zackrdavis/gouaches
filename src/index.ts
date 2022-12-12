@@ -3,6 +3,7 @@ const canvas = document.querySelector("canvas");
 const cvWidth = canvas.width;
 const cvHeight = canvas.height;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
 ctx.lineWidth = 2;
 ctx.strokeStyle = "black";
 
@@ -18,13 +19,8 @@ const colors: { [key: string]: Color } = {
 
 let selectedColor = colors.black;
 
-// is user currently drawing a line?
-// if so, from where
+// is user currently drawing a line? If so from where?
 let isDrawingFrom: Coords | false = false;
-
-// is user currently applying a fill?
-// if so, what color
-//let isFillingWithColor: Color | false = false;
 
 // set and clear this timer when filling or finished
 let fillInterval = 0;
