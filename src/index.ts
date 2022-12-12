@@ -8,10 +8,10 @@ type Coords = [number, number];
 type Color = [number, number, number, number];
 
 const colors: { [key: string]: Color } = {
-  black: [0, 0, 0, 1],
-  red: [255, 0, 0, 1],
-  green: [0, 255, 0, 1],
-  blue: [0, 0, 255, 1],
+  black: [0, 0, 0, 255],
+  red: [255, 0, 0, 255],
+  green: [0, 255, 0, 255],
+  blue: [0, 0, 255, 255],
 };
 
 let selectedColor = colors.black;
@@ -24,9 +24,82 @@ let isDrawingFrom: Coords | false = false;
 // if so, what color
 let isFillingWithColor: Color | false = false;
 
+// set and clear this timer when filling or finished
+let fillInterval = 0;
+let testStack: Coords[] = [];
+
+const nTimes = (n: number, fn: any) => {
+  for (let i = 0; i < n; i++) {
+    fn();
+  }
+};
+
+const fill = () => {
+  if (testStack.length > 0) {
+    const testNode = testStack.shift();
+
+    // check for insideness (Blankness?)
+    if (isColorEq(getPixelColor(testNode), [0, 0, 0, 0])) {
+      drawColorPixel(testNode, selectedColor);
+
+      // west, east, north and south nodes
+      const neighbors: Coords[] = [
+        [testNode[0] + 1, testNode[1]],
+        [testNode[0] - 1, testNode[1]],
+        [testNode[0], testNode[1] + 1],
+        [testNode[0], testNode[1] - 1],
+      ];
+
+      testStack.push(...neighbors);
+    }
+  }
+};
+
+const isColorEq = (colorA: Color, colorB: Color) => {
+  return (
+    colorA[0] == colorB[0] &&
+    colorA[1] == colorB[1] &&
+    colorA[2] == colorB[2] &&
+    colorA[3] == colorB[3]
+  );
+};
+
+const getPixelColor = (pos: Coords) => {
+  const [x, y] = pos;
+
+  // convert x,y to the start index for the color data
+  const imageIndex = x + y * canvas.width;
+
+  // get the current imageData
+  const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  return [
+    image.data[imageIndex * 4 + 0],
+    image.data[imageIndex * 4 + 1],
+    image.data[imageIndex * 4 + 2],
+    image.data[imageIndex * 4 + 3],
+  ] as Color;
+};
+
+const startFill = (pos: Coords) => {
+  testStack.push(pos);
+  fillInterval = setInterval(() => {
+    nTimes(20, fill);
+  }, 10);
+};
+
+const stopFill = () => {
+  clearInterval(fillInterval);
+  testStack = [];
+};
+
 /** Draw a single pixel */
 const drawColorPixel = (pos: Coords, color: Color) => {
   const [x, y] = pos;
+
+  // stop if pos outside canvas bounds
+  if (x > canvas.width || y > canvas.height) return false;
+
   const [r, g, b, a] = color;
 
   // convert x,y to the start index for the color data
@@ -67,10 +140,15 @@ const handleMouseDown = (e: PointerEvent) => {
   const y = e.clientY - canvas.offsetTop;
 
   // save as starting position for a potential line
-  isDrawingFrom = [x, y];
+  if (selectedColor == colors.black) {
+    isDrawingFrom = [x, y];
+  } else {
+    isFillingWithColor = selectedColor;
+    startFill([x, y]);
+  }
 
   // draw the pixel
-  drawColorPixel([x, y], selectedColor);
+  //drawColorPixel([x, y], selectedColor);
 };
 
 const handleMouseMove = (e: PointerEvent) => {
@@ -88,6 +166,7 @@ const handleMouseMove = (e: PointerEvent) => {
 const handleMouseUp = (e: PointerEvent) => {
   isDrawingFrom = false;
   isFillingWithColor = false;
+  stopFill();
 };
 
 const handleSwatchClick = (e: MouseEvent) => {
