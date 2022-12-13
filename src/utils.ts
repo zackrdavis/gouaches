@@ -12,6 +12,16 @@ const nTimes = (fn: any, n: number) => {
   }
 };
 
+/** Test if color is black-ish (pencil line) */
+const isBlackish = (testColor: Color) => {
+  return (
+    testColor[0] == 0 &&
+    testColor[0] == 0 &&
+    testColor[2] == 0 &&
+    testColor[3] !== 0
+  );
+};
+
 /** get diagonal distance between coordinates, rounded */
 const distance = ([x1, y1]: Coords, [x2, y2]: Coords) => {
   const a = x1 - x2;

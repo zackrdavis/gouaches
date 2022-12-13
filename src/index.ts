@@ -43,12 +43,7 @@ const fill = (diagonal = false) => {
 
     if (
       // color is not blackIsh (uncrossable crayon lines)
-      !(
-        testColor[0] == 0 &&
-        testColor[0] == 0 &&
-        testColor[2] == 0 &&
-        testColor[3] !== 0
-      ) &&
+      !isBlackish(testColor) &&
       // map says this color is not set
       isColorEq(mapColor, [0, 0, 0, 0])
     ) {
