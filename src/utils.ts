@@ -16,7 +16,7 @@ const nTimes = (fn: any, n: number) => {
 const isPencil = (testColor: Color) => {
   return (
     testColor[0] == 0 &&
-    testColor[0] == 0 &&
+    testColor[1] == 0 &&
     testColor[2] == 0 &&
     testColor[3] !== 0
   );
