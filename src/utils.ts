@@ -5,6 +5,13 @@ const resetPixelMap = () => {
   );
 };
 
+/** get canvas coordinates from clicks */
+const getCoords = (e: PointerEvent) => {
+  const x = e.clientX - canvas.offsetLeft;
+  const y = e.clientY - canvas.offsetTop;
+  return [x, y] as Coords;
+};
+
 /** Repeat a function `n` times */
 const nTimes = (fn: any, n: number) => {
   for (let i = 0; i < n; i++) {

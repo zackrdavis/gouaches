@@ -59,7 +59,8 @@ const fill = (diagonal = false) => {
       // save where we drew the new color
       pixelMap[x][y] = selectedColor;
 
-      // By alternating NSEW and diagonals
+      // By alternating NSEW and diagonals we can get a rounded-square fill area
+      // Skips some pixels but that looks nice :)
       const neighbors = !diagonal
         ? ([
             [x + 1, y],
@@ -107,8 +108,7 @@ const stopFill = () => {
 };
 
 const handleMouseDown = (e: PointerEvent) => {
-  const x = e.clientX - canvas.offsetLeft;
-  const y = e.clientY - canvas.offsetTop;
+  const [x, y] = getCoords(e);
 
   // save as starting position for a potential line
   if (selectedColor == colors.black) {
@@ -123,8 +123,7 @@ const handleMouseDown = (e: PointerEvent) => {
 
 const handleMouseMove = (e: PointerEvent) => {
   if (isDrawingFrom) {
-    const x = e.clientX - canvas.offsetLeft;
-    const y = e.clientY - canvas.offsetTop;
+    const [x, y] = getCoords(e);
 
     lineBetween(isDrawingFrom, [x, y]);
 
