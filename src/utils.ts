@@ -12,11 +12,11 @@ const nTimes = (fn: any, n: number) => {
   }
 };
 
-/** get diagonal distance between coordinates */
+/** get diagonal distance between coordinates, rounded */
 const distance = ([x1, y1]: Coords, [x2, y2]: Coords) => {
   const a = x1 - x2;
   const b = y1 - y2;
-  return Math.sqrt(a * a + b * b);
+  return Math.round(Math.sqrt(a * a + b * b));
 };
 
 /**

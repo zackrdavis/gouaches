@@ -33,7 +33,7 @@ let pixelMap: Color[][];
 // init pixelMap
 resetPixelMap();
 
-const fill = () => {
+const fill = (diagonal = false) => {
   if (testStack.length > 0) {
     const [x, y] = testStack.shift();
 
@@ -42,27 +42,44 @@ const fill = () => {
     const mapColor = pixelMap[x][y];
 
     if (
-      // color is not black (uncrossable crayon lines)
-      !isColorEq(testColor, [0, 0, 0, 255]) &&
+      // color is not blackIsh (uncrossable crayon lines)
+      !(
+        testColor[0] == 0 &&
+        testColor[0] == 0 &&
+        testColor[2] == 0 &&
+        testColor[3] !== 0
+      ) &&
       // map says this color is not set
       isColorEq(mapColor, [0, 0, 0, 0])
     ) {
-      const distFromStart = Math.round(distance(fillStart, [x, y]));
+      // new color will be selectedColor faded by distanceFromStart
       const newColor: Color = [...selectedColor];
-      newColor[3] = Math.max(selectedColor[3] - distFromStart, 20);
+      newColor[3] = Math.max(
+        selectedColor[3] - distance(fillStart, [x, y]),
+        20
+      );
 
       drawColorPixel([x, y], newColor);
 
       // save where we drew the new color
       pixelMap[x][y] = selectedColor;
 
-      // west, east, north and south nodes
-      const neighbors = [
-        [x + 1, y],
-        [x - 1, y],
-        [x, y + 1],
-        [x, y - 1],
-      ].filter(isInBounds) as Coords[];
+      // By alternating NSEW and diagonals
+      const neighbors = !diagonal
+        ? ([
+            [x + 1, y],
+            [x - 1, y],
+            [x, y + 1],
+            [x, y - 1],
+          ].filter(isInBounds) as Coords[])
+        : ([
+            [x + 1, y + 1],
+            [x - 1, y - 1],
+            [x - 1, y + 1],
+            [x + 1, y - 1],
+          ].filter(isInBounds) as Coords[]);
+
+      shuffleArray(neighbors);
 
       testStack.push(...neighbors);
     }
@@ -75,12 +92,18 @@ const startFill = (pos: Coords) => {
 
   fillInterval = setInterval(
     // increase loops-per-second at same rate that testStack is growing
-    () => nTimes(fill, testStack.length),
+    () =>
+      nTimes(() => {
+        fill();
+        fill(true);
+      }, testStack.length),
     10
   );
 };
 
 const stopFill = () => {
+  console.log("stopFill");
+
   clearInterval(fillInterval);
 
   // reset lists
