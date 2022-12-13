@@ -140,7 +140,7 @@ const handleSwatchClick = (e: MouseEvent) => {
   ctx.strokeStyle = `rgba(${selectedColor.join(",")})`;
 };
 
-document.addEventListener("mousedown", handleMouseDown);
+canvas.addEventListener("mousedown", handleMouseDown);
 document.addEventListener("mouseup", handleMouseUp);
 canvas.addEventListener("mousemove", handleMouseMove);
 
