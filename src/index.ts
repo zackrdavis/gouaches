@@ -4,7 +4,6 @@ const cvWidth = canvas.width;
 const cvHeight = canvas.height;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-ctx.lineWidth = 2;
 ctx.strokeStyle = "black";
 
 type Coords = [number, number];
@@ -42,7 +41,6 @@ const fill = (diagonal = false) => {
     const mapColor = pixelMap[x][y];
 
     if (
-      // color is not blackIsh (uncrossable crayon lines)
       !isPencil(testColor) &&
       // map says this color is not set
       isColorEq(mapColor, [0, 0, 0, 0])

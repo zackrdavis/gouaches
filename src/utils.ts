@@ -21,12 +21,19 @@ const nTimes = (fn: any, n: number) => {
 
 /** Test if color is black-ish (pencil line) */
 const isPencil = (testColor: Color) => {
-  return (
-    testColor[0] == 0 &&
-    testColor[1] == 0 &&
-    testColor[2] == 0 &&
-    testColor[3] !== 0
-  );
+  // if 2 of 3 color channels are less than 20
+  // TODO: Revisit this - not quite working perceptually
+  // but it does allow pencil lines over colors to contain addt'l fills
+  const lowColors = testColor.slice(0, 3).filter((v) => v < 100);
+
+  return lowColors.length > 2 && testColor[3] !== 0;
+
+  // return (
+  //   testColor[0] == 0 &&
+  //   testColor[1] == 0 &&
+  //   testColor[2] == 0 &&
+  //   testColor[3] !== 0
+  // );
 };
 
 /** get diagonal distance between coordinates, rounded */
@@ -79,14 +86,10 @@ const drawColorPixel = ([x, y]: Coords, color: Color) => {
 
 /** Draw a black line between two points */
 const lineBetween = ([x1, y1]: Coords, [x2, y2]: Coords) => {
-  if (isDrawingFrom) {
-    // render the path
-    ctx.beginPath();
-    // add 0.5 because positions are between pixels by default.
-    // I want solid black lines.
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-    ctx.closePath();
-  }
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.closePath();
 };
