@@ -1,3 +1,13 @@
+type Coords = [number, number];
+type Color = [number, number, number, number];
+
+const colors: { [key: string]: Color } = {
+  black: [0, 0, 0, 255],
+  red: [255, 0, 0, 255],
+  green: [0, 255, 0, 255],
+  blue: [0, 0, 255, 255],
+};
+
 /** Reset the pixel map */
 const resetPixelMap = () => {
   pixelMap = [...Array(cvWidth)].map((_) =>
