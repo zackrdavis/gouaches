@@ -13,7 +13,7 @@ const nTimes = (fn: any, n: number) => {
 };
 
 /** Test if color is black-ish (pencil line) */
-const isBlackish = (testColor: Color) => {
+const isPencil = (testColor: Color) => {
   return (
     testColor[0] == 0 &&
     testColor[0] == 0 &&
