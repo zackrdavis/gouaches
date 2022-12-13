@@ -4,6 +4,8 @@ Draw lines with the wax pencil.
 
 Pick a color, click, and hold to make a spreading and diluting pool of pigment.
 
+[Live Demo](https://zackrdavis.github.io/gouaches/)
+
 Typescript watch files:
 
 ```
