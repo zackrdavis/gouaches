@@ -3,7 +3,7 @@
 Minimal drawing canvas with a twist on the basic flood-fill.
 
 1. Draw outlines with the wax pencil. 
-2. Select a color, click, and hold to create a growing pool of pigment.
+2. Select a color, click and hold to create a growing pool of pigment.
 
 [Live Demo](https://zackrdavis.github.io/gouaches/)
 
