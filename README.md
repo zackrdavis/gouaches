@@ -1,8 +1,9 @@
 # Gouaches
 
-Draw lines with the wax pencil.
+Minimal drawing canvas with a twist on the basic flood-fill.
 
-Pick a color, click, and hold to make a spreading and diluting pool of pigment.
+1. Draw outlines with the wax pencil. 
+2. Select a color, click, and hold to create a growing pool of pigment.
 
 [Live Demo](https://zackrdavis.github.io/gouaches/)
 
@@ -22,8 +23,6 @@ Reload for changes.
 
 ### Next Steps:
 
-- Reliably track pencil pixels for fill-blocking (edge fade confuses color tester)
+- Track pencil pixels for fill-blocking (color comparison is flakey due to anti-aliasing)
 - Fade color by maze distance, not as-the-crow-flies
-- Draggable fill action
-- Better algorithm for circular fill area
-- Mix colors realistically
+- Mix colors by subtraction, not addition
